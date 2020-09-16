@@ -74,11 +74,39 @@ api folder is for the python code
 
 venv has been created with python -m venv venv
 then activate with .\venv\Scripts\activate
-pip install flask python-dotenv
 test with flask run
 
-https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project
+heroku local web -f Procfile.windows
 
 ## Deploy to heroku
-
+https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project
+https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project
+https://blog.miguelgrinberg.com/post/how-to-deploy-a-react-router-flask-application
 https://medium.com/swlh/how-to-deploy-a-react-python-flask-project-on-heroku-edb99309311
+https://github.com/memcachier/examples-flask
+https://github.com/neelsomani/react-flask-heroku
+https://gist.github.com/mayukh18/2223bc8fc152631205abd7cbf1efdd41/
+
+
+Dependencies
+python3, npm, Heroku CLI
+
+Setup
+pip3 install -r requirements.txt
+npm install
+
+Running Locally
+npm run build
+heroku local web -f Procfile.dev.windows
+The application will be running at http://127.0.0.1:5000/.
+
+Deploying
+First, create your app on Heroku. Then:
+heroku git:remote -a {YOUR_APP_NAME}
+heroku buildpacks:set heroku/python
+heroku buildpacks:add --index 1 heroku/nodejs
+git push heroku master
+
+Project Structure
+Flask server is at app.py
+React components in src/

@@ -1,0 +1,1 @@
+web: set FLASK_ENV=development && set FLASK_DEBUG=1 && python manage.py runserver -h 127.0.0.1 -p 5000

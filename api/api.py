@@ -1,14 +1,27 @@
 import time
 import string
-import random
-import os
 from flask import Flask, request, jsonify
-from repo import Repo
+from .repo import Repo, DEFAULT_USER_NAMES
 
-app = Flask(__name__)
+app = Flask('api', static_folder='../build', static_url_path='/')
 
 repo = Repo()
-defaultUserNames = tuple(["Alfa", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel"])
+
+@app.route('/')
+def root():
+    return app.send_static_file('index.html')
+
+@app.route('/admin')
+def admin():
+    return app.send_static_file('index.html')
+    
+@app.route('/robot.txt')
+def robot():
+    return app.send_static_file('robot.txt')
+
+@app.errorhandler(404)
+def not_found(e):
+    return app.send_static_file('index.html')
 
 @app.route('/api/users', methods=['GET', 'POST'])
 def get_current_users():
@@ -23,11 +36,11 @@ def get_users_reset():
 
 @app.route('/api/user/assign', methods=['GET'])
 def get_assign_user():
-    global defaultUserNames
+    global DEFAULT_USER_NAMES
     users_names = repo.get_users_names()
-    if len(users_names) == len(defaultUserNames):
+    if len(users_names) == len(DEFAULT_USER_NAMES):
         return "No names available", 400
-    username = next(new_user for new_user in defaultUserNames if new_user not in users_names)
+    username = next(new_user for new_user in DEFAULT_USER_NAMES if new_user not in users_names)
     repo.add_user_name(username)
     return {'user': username}
 
@@ -77,5 +90,6 @@ def get_reset_all():
     repo.clear_users()
     return {}
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=False, port=os.environ.get('PORT', 80))
+
+if __name__ == '__main__':
+    app.run()

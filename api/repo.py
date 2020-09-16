@@ -1,4 +1,7 @@
-from models import Model, User, ThreePoint
+from .models import Model, User, ThreePoint
+
+DEFAULT_USER_NAMES = tuple(["Alfa", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel"])
+
 
 class Repo():
     users = []

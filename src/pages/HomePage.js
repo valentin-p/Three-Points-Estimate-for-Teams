@@ -38,9 +38,10 @@ class HomePage extends React.Component {
     window.onbeforeunload = this.componentCleanup;
   }
 
-  componentWillUnmount(){
-    window.onbeforeunload = this.componentCleanup;
+  componentWillUnmount() {
+    // Only works with Chrome
     this.componentCleanup();
+    window.onbeforeunload = this.componentCleanup;
   }
 
   render() {

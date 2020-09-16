@@ -72,6 +72,13 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 ### Flask
 api folder is for the python code
 
-venv has been created with python -m venv venv and then activate with .\venv\Scripts\Activate.bat
+venv has been created with python -m venv venv
+then activate with .\venv\Scripts\activate
+pip install flask python-dotenv
+test with flask run
 
 https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project
+
+## Deploy to heroku
+
+https://medium.com/swlh/how-to-deploy-a-react-python-flask-project-on-heroku-edb99309311

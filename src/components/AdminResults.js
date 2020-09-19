@@ -9,14 +9,27 @@ class DisplayResults extends React.Component {
       hashCode: 0,
       results: '',
       partialResults: '',
+      ticketNumber: '',
+      prefixLink: '',
     };
 
     this.resetUsers = this.resetUsers.bind(this);
     this.getResults = this.getResults.bind(this);
+    this.nextTicket = this.nextTicket.bind(this);
+    this.handleChangeAndResize = this.handleChangeAndResize.bind(this);
   }
 
   getResults() {
-    fetch('/api/points/total')
+    const form = new FormData();
+    if(this.state.prefixLink !== ''){
+      form.append('url', this.state.prefixLink+this.state.ticketNumber);
+    }else{
+      form.append('url', '');
+    }
+    fetch('/api/points/total', {
+      method: "POST",
+      body: form,
+    })
     .then((r) => {
       if(r.ok){
         return r.json();
@@ -59,7 +72,6 @@ class DisplayResults extends React.Component {
             })
         }
       }
-      
     });
   }
 
@@ -67,6 +79,14 @@ class DisplayResults extends React.Component {
     fetch('/api/all/reset')
     .then((r) => r.json())
     .then(this.getResults)
+  }
+
+  nextTicket() {
+    fetch('/api/points/reset')
+    .then((r) => r.json())
+    .then(()=>{
+      this.setState({ticketNumber: ""});
+    })
   }
 
   componentDidMount() {
@@ -77,8 +97,16 @@ class DisplayResults extends React.Component {
   componentWillUnmount() {
     clearInterval(this.interval);
   }
+  
+  handleChangeAndResize(e) {
+    this.setState({[e.target.name]: e.target.value || ''})
+    var spanElm = e.target.nextElementSibling;
+    spanElm.textContent = e.target.value;
+    e.target.style.width = (spanElm.scrollWidth > 60 ? spanElm.scrollWidth - 40 : 60) + 'px'; // apply width of the span to the input
+  }
 
   render() {
+    const displayTicketUrl = this.state.prefixLink===''?'':this.state.prefixLink+this.state.ticketNumber;
     return (
       <div>
         <hr />
@@ -92,9 +120,15 @@ class DisplayResults extends React.Component {
           <label><input type="checkbox" checked={this.state.forceResults} onChange={() => this.setState({forceResults: !this.state.forceResults})} />Force results</label>
           <div></div>
           <button onClick={this.resetUsers}>Reset Users</button>
+          <div></div>
+          <button onClick={this.nextTicket}>Reset Results</button>
+          <div>
+            <label>Prefix Link <input className="adaptative-size" type="text" name="prefixLink" value={this.state.prefixLink} onChange={this.handleChangeAndResize} style={{borderRight: "1px"}} /><span className="adaptative-measure"></span></label>
+            <label><input className="adaptative-size" type="text" name="ticketNumber" value={this.state.ticketNumber} onChange={this.handleChangeAndResize} style={{borderLeft: "none", width : "60px"}} /><span className="adaptative-measure"></span> Ticket Number</label>
+          </div>
+          <a href={this.state.prefixLink+this.state.ticketNumber} target="_blank" rel="noopener noreferrer">{displayTicketUrl}</a>
         <hr />
         <div>
-          {/* {(this.state.results || this.state.forceResults) && <Table data={this.state.rawData}/> } */}
           {(this.state.results || this.state.forceResults) && this.state.users && <span>Users: {this.state.users.join(', ')}</span>}
           {(this.state.results || this.state.forceResults) && this.state.rawData && 
             <table>

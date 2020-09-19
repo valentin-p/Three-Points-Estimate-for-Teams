@@ -53,6 +53,13 @@ def post_release_user():
  
 @app.route('/api/points/total', methods=['GET', 'POST'])
 def get_points_total():
+    form = request.args if request.method == 'GET' else request.form
+    if request.method == 'POST':
+        url = form.get("url")
+        if url != None:
+            repo.update_url(url)
+    url = repo.get_url()
+
     three_points = repo.get_three_points()
     missingNames = repo.get_missing_names()
     waitingFor = "anyone to connect." if not missingNames and not three_points else ",".join(missingNames)
@@ -64,6 +71,7 @@ def get_points_total():
         'results': results,
         'status': status,
         'waitingFor': waitingFor,
+        'ticketUrl': url,
         'hashCode': str(hash_code),
     }
 

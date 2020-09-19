@@ -162,3 +162,14 @@ table th {
   background-color: #4CAF50;
   color: white;
 }
+
+
+.adaptative-size, .adaptative-measure {
+  white-space: pre;
+}
+
+.adaptative-measure {  
+position: absolute;
+left: -9999px;
+top: -9999px;
+}

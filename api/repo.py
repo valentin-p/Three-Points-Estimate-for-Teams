@@ -6,6 +6,7 @@ DEFAULT_USER_NAMES = tuple(["Alfa", "Bravo", "Charlie", "Delta", "Echo", "Foxtro
 class Repo():
     users = []
     three_points = []
+    url = ''
 
 
     def get_users(self, name = None):
@@ -61,3 +62,9 @@ class Repo():
 
     def get_hash_code(self):
         return Model.get_hash_codes(self.users+self.three_points)
+
+    def get_url(self):
+        return self.url
+
+    def update_url(self, url):
+        self.url = url

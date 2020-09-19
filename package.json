@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "startapi": "cd api && ..\\.\\venv\\Scripts\\flask.exe run --no-debugger",
+    "startapi": "cd api && set FLASK_APP=api:app && set FLASK_ENV=development && set FLASK_DEBUG=1 && ..\\.\\venv\\Scripts\\flask.exe run --no-debugger",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

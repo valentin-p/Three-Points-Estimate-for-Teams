@@ -95,8 +95,9 @@ Setup
 pip3 install -r requirements.txt
 npm install
 
-Running Locally
+Running Locally: only python rebiuld on change
 npm run build
+.\venv\Scripts\activate
 heroku local web -f Procfile.dev.windows
 The application will be running at http://127.0.0.1:5000/.
 

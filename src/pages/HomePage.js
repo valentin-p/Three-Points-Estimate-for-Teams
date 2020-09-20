@@ -3,54 +3,121 @@ import PointEstimateForm from '../components/Home';
 import UserResults from '../components/HomeResults';
 
 class HomePage extends React.Component {
-  constructor(){
-    super()
+  constructor() {
+    super();
     this.state = {
       user: '',
+      name: '',
       isUserLoaded: false,
-      errorMessage: ''
-    }
-    
-    this.componentCleanup = this.releaseUser.bind(this);
+      errorMessage: '',
+    };
+
+    this.releaseUser = this.releaseUser.bind(this);
+    this.assignUserWrapper = this.assignUserWrapper.bind(this);
+    this.assignUser = this.assignUser.bind(this);
+    this.handleChangeAndResize = this.handleChangeAndResize.bind(this);
+
+    this.changeNameTimeout = null;
+    this.assignUserDefered = false;
+    this.assignUserLock = false;
   }
 
-  releaseUser() {
+  releaseUser(callback = false) {
     const form = new FormData();
     form.append('user', this.state.user);
-    fetch('/api/user/release', {method: 'POST', body: form})
+    fetch('/api/user/release', { method: 'POST', body: form }).then(() => {
+      if (callback) this.assignUserWrapper();
+    });
   }
-  
-  componentDidMount() {
-    fetch('/api/user/assign')
+
+  assignUserWrapper() {
+    if (this.assignUserLock === true) {
+      this.assignUserDefered = true;
+      return;
+    }
+    this.assignUserLock = true;
+    this.assignUser();
+  }
+
+  assignUser() {
+    const form = new FormData();
+    if (this.state.name !== '') {
+      form.append('name', this.state.name);
+    }
+
+    fetch('/api/user/assign', { method: 'POST', body: form })
       .then((r) => {
-        if(r.ok){
+        if (r.ok) {
           return r.json();
-        }else{
+        } else {
+          this.assignUserLock = false;
           console.error(r);
           throw new Error("Server can't be reached!");
         }
       })
       .then((data) => {
-        document.title = `${data.user} - TPE for Teams` 
-        this.setState({user: data.user});
+        this.setState({ user: data.user }, () => {
+          document.title = `${data.user} - TPE for Teams`;
+          this.assignUserLock = false;
+          if (this.assignUserDefered === true) {
+            this.assignUserDefered = false;
+            if (this.state.user !== this.state.name) {
+              this.assignUserWrapper();
+            }
+          }
+        });
       });
+  }
 
-    window.onbeforeunload = this.componentCleanup;
+  handleChangeAndResize(e) {
+    this.setState({ [e.target.name]: e.target.value.trim() || '' }, () => {
+      if (this.changeNameTimeout != null) {
+        clearTimeout(this.changeNameTimeout);
+      }
+      this.changeNameTimeout = setTimeout(() => {
+        this.releaseUser(true);
+        this.changeNameTimeout = null;
+      }, 300);
+    });
+
+    var spanElm = e.target.nextElementSibling;
+    spanElm.textContent = e.target.value;
+    e.target.style.width =
+      (spanElm.scrollWidth > 100 ? spanElm.scrollWidth : 100) + 'px';
+  }
+
+  componentDidMount() {
+    this.assignUserWrapper();
+    window.onbeforeunload = this.releaseUser;
   }
 
   componentWillUnmount() {
     // Only works with Chrome
-    this.componentCleanup();
-    window.onbeforeunload = this.componentCleanup;
+    this.releaseUser();
+    window.onbeforeunload = this.releaseUser;
   }
 
   render() {
-      return (
+    return (
       <div className="App">
         <header className="App-header">
           <>
-            { this.state.errorMessage && <h3 className="error"> { this.state.errorMessage } </h3> }
+            {this.state.errorMessage && (
+              <h3 className="error"> {this.state.errorMessage} </h3>
+            )}
             Your name is {this.state.user}.
+            <label>
+              Change Name{' '}
+              <input
+                className="adaptative-size"
+                type="text"
+                name="name"
+                autoComplete="off"
+                value={this.state.name}
+                onChange={this.handleChangeAndResize}
+              />
+              <span className="adaptative-measure"></span>
+            </label>
           </>
         </header>
         <div>
@@ -58,7 +125,7 @@ class HomePage extends React.Component {
           <UserResults />
         </div>
       </div>
-    )
+    );
   }
 }
 export default HomePage;
